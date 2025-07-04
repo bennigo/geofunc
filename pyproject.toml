@@ -1,0 +1,20 @@
+[project]
+name = "geofunc"
+version = "0.2.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Benedikt Gunnar Ófeigsson", email = "bgo@vedur.is" },
+    { name = "Maria Fernanda Gonzalez", email = "mariagr@vedur.is" },
+]
+maintainers = [{ name = "Benedikt Gunnar Ófeigsson", email = "bgo@vedur.is" }]
+
+requires-python = ">=3.13"
+dependencies = []
+
+[project.scripts]
+geofunc = "geofunc:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
