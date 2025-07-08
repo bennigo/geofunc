@@ -74,7 +74,7 @@ def plateVelo(locList, plate=None, reference="ITRF2008"):
     staDict = {}
 
     NEU_vel = np.zeros([len(locList), 3], dtype="float64")
-    coordfile = config.getPostprocessConfig("coordfile")
+    coordfile = config.getPostProcessConfig("coordFile")
 
     f = open(coordfile)
     staDict.update(
@@ -139,7 +139,7 @@ def plateDict():
     # config.read(ConfigParser().getPostprocessConfig("pfile"))
 
     plateDict = {}
-    pfile = config.getPostprocessConfig("pfile")
+    pfile = config.getPostProcessConfig("platefile")
     #   f = open(config.getPostprocessConfig("pfile"))#], "r")
     with open(pfile) as f:
         for line in f:
