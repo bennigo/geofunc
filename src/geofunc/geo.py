@@ -130,19 +130,45 @@ def gdatum(datum="IGS08"):
 
 
 def xyzell(xyzcoor, datum=itrf2008, radians=True):
-    """
-    Function to convert xyz coordinates to llh. It uses the pyproj library
+    """Convert geocentric ECEF ``xyz`` to geodetic ``lat, lon, height``.
+
+    .. warning::
+
+       **Returns (LATITUDE, LONGITUDE, HEIGHT) — not (lon, lat, height).**
+
+       ``lonlat`` is ``CRS("EPSG:4326")``, whose *authority* axis order is
+       (latitude, longitude), and :func:`pyproj.transform` honours that order
+       here because it is called without ``always_xy=True``. Contrast
+       ``itrf08towgs84`` in this same module, which *does* pass
+       ``always_xy=True`` and so yields x/y (lon/lat) order — this module is
+       not internally consistent, so check each helper rather than assuming.
+
+       This docstring previously claimed ``(lon, lat, height)``. That was true
+       under pyproj 1.x, where ``lonlat`` was ``proj.Proj(init="EPSG:4326")``
+       (see the commented-out definitions at the top of this module) and the
+       traditional x/y order applied. The pyproj 1→2 migration silently flipped
+       the axis order; the docstring was never updated, so the two disagreed
+       for years and callers were written against the wrong contract.
+
+       Verified 2026-08-10 against REYK (ECEF 2587383.91122, -1043033.58722,
+       5716564.1974) → ``[64.138788, -21.955490, 93.028]``: 64.14 is the
+       latitude of Reykjavík, -21.96 its longitude. The same two numbers appear
+       *correctly labelled but in the opposite order* in the pre-migration
+       example still shown in :func:`geofunc.geofunc.getStationCoordinates`,
+       which is the clearest evidence of when the flip happened.
 
     Args:
-        x,y,z => long,lat,height
-        usage: xyzell(xyzcoor,datum)
-        datum: reference to datum definition
-        xyzcoor: reference to a xyz coordinates
-        returns reference to a list
-         ( LONGITUDE, LATITUDE, HEIGHT(over ellipsoid))
+        xyzcoor: sequence of geocentric ``(X, Y, Z)`` in metres.
+        datum: source CRS for the ECEF coordinates (default ITRF2008,
+            EPSG:5332, GRS80 ellipsoid).
+        radians: when True (the default) latitude and longitude are returned in
+            radians; pass ``radians=False`` for degrees. Height is always in
+            metres and is **ellipsoidal**, not orthometric — geoid separation
+            is location dependent (~60-70 m in Iceland) and must be applied
+            separately if an orthometric height is wanted.
 
     Returns:
-        np.array(lon,lat,height)
+        ``np.array([latitude, longitude, height_over_ellipsoid])``
     """
 
     return np.array(proj.transform(datum, lonlat, *xyzcoor, radians=radians))
